@@ -1,4 +1,5 @@
 using DirectoryApi.Repositories;
+using DirectoryApi.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -13,6 +14,10 @@ builder.Services.AddCors(c => c.AddPolicy("CorsPolicy", builder => builder.Allow
 // ToDo. Add an other db provider when is not Development environment
 // Configure DbContext to use InMemoryDatabase
 builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseInMemoryDatabase("DirectoryDb"));
+
+// Configure dependencies
+builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+builder.Services.AddScoped<IDirectoryService, DirectoryService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
