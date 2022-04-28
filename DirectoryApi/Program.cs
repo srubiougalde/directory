@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddCors(c => c.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+
 // ToDo. Add an other db provider when is not Development environment
 // Configure DbContext to use InMemoryDatabase
 builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseInMemoryDatabase("DirectoryDb"));
@@ -30,6 +32,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 
