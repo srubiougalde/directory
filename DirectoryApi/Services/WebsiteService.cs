@@ -18,8 +18,20 @@ public class WebsiteService : IWebsiteService
         return _websiteRepository.GetWebsiteByIdAsync(id);
     }
 
+    public Task<Website> GetWebsiteByShortUrlAsync(string shortUrl)
+    {
+        var id = ShortUrlHelper.Decode(shortUrl);
+
+        return _websiteRepository.GetWebsiteByIdAsync(id);
+    }
+
     public async Task<Website> SyncWebsiteHeadingAsync(Website website)
     {
+        if (string.IsNullOrEmpty(website.ShortUrl))
+        {
+            website.ShortUrl = ShortUrlHelper.Encode(website.Id);
+        }
+
         website.Headings = FeedHelper.ReadHeadings(website.Url).Select(x => new WebsiteHeading
         {
             Name = x.OriginalName,

@@ -35,7 +35,8 @@ public class DirectoryController : ControllerBase
         {
             Id = x.Id,
             Name = x.Name,
-            WebsiteUrl = x.Website.Url
+            WebsiteUrl = x.Website.Url,
+            WebsiteShortUrl = $"https://evr.ly/{x.Website.ShortUrl}",
         });
 
         return Ok(respose);
@@ -56,7 +57,8 @@ public class DirectoryController : ControllerBase
         {
             Id = member.Id,
             Name = member.Name,
-            WebsiteUrl = member.Website.Url
+            WebsiteUrl = member.Website.Url,
+            WebsiteShortUrl = $"https://evr.ly/{member.Website.ShortUrl}"
         };
 
         return Ok(respose);
@@ -86,7 +88,8 @@ public class DirectoryController : ControllerBase
         {
             Id = member.Id,
             Name = member.Name,
-            WebsiteUrl = member.Website.Url
+            WebsiteUrl = member.Website.Url,
+            WebsiteShortUrl = $"https://evr.ly/{member.Website.ShortUrl}"
         };
 
         return Ok(respose);
