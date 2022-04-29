@@ -10,11 +10,15 @@ namespace DirectoryApi.Controllers;
 [Route("api/[controller]")]
 public class DirectoryController : ControllerBase
 {
+    private readonly IStringLocalizer<DirectoryController> _localizer;
+    private readonly IStringLocalizer<SharedResource> _sharedLocalizer;
     private readonly ILogger<DirectoryController> _logger;
     private readonly IDirectoryService _directoryService;
 
-    public DirectoryController(ILogger<DirectoryController> logger, IDirectoryService directoryService)
+    public DirectoryController(IStringLocalizer<DirectoryController> localizer, IStringLocalizer<SharedResource> sharedLocalizer, ILogger<DirectoryController> logger, IDirectoryService directoryService)
     {
+        _localizer = localizer;
+        _sharedLocalizer = sharedLocalizer;
         _logger = logger;
         _directoryService = directoryService;
     }
@@ -22,7 +26,7 @@ public class DirectoryController : ControllerBase
     [HttpGet("members")]
     public async Task<IActionResult> GetMembers()
     {
-        _logger.LogInformation("Getting list of members");
+        _logger.LogInformation(_localizer["Getting list of members"]);
         var members = await _directoryService.GetAllMembersAsync();
 
         var respose = members.Select(x => new GetMemberResponse
@@ -38,7 +42,7 @@ public class DirectoryController : ControllerBase
     [HttpGet("members/{id}")]
     public async Task<IActionResult> GetMemberById(Guid id)
     {
-        _logger.LogInformation($"Getting member by id {id}");
+        _logger.LogInformation($"{_localizer["Getting member by id"]} {id}");
         var member = await _directoryService.GetMemberByIdAsync(id);
 
         if (member == null)
@@ -59,7 +63,7 @@ public class DirectoryController : ControllerBase
     [HttpPost("members")]
     public async Task<IActionResult> CreateMember(CreateMemberRequest input)
     {
-        _logger.LogInformation($"Creating member");
+        _logger.LogInformation(_localizer["Creating member"]);
         var member = await _directoryService.CreateMemberAsync(new Member
         {
             Name = input.Name,
@@ -84,7 +88,7 @@ public class DirectoryController : ControllerBase
     [HttpPut("members/{id}")]
     public async Task<IActionResult> UpdateMember(Guid id, CreateMemberRequest input)
     {
-        _logger.LogInformation($"Updating member with id {id}");
+        _logger.LogInformation($"{_localizer["Updating member with id"]} {id}");
         var memberInput = new Member
         {
             Name = input.Name,
@@ -99,7 +103,7 @@ public class DirectoryController : ControllerBase
     [HttpDelete("members/{id}")]
     public async Task<IActionResult> DeleteMember(Guid id)
     {
-        _logger.LogInformation($"Deleting member with id {id}");
+        _logger.LogInformation($"{_localizer["Deleting member with id"]} {id}");
         var member = await _directoryService.DeleteMemberAsync(id);
 
         if (member == null)

@@ -12,12 +12,16 @@ namespace DirectoryApi.Tests;
 
 public class DirectoryControllerTests
 {
+    private readonly Mock<IStringLocalizer<DirectoryController>> _mockLocalizer;
+    private readonly Mock<IStringLocalizer<SharedResource>> _mockSharedLocalizer;
     private readonly Mock<ILogger<DirectoryController>> _mockLogger;
     private readonly Mock<IDirectoryService> _mockDirectoryService;
     private readonly DirectoryController _controller;
 
     public DirectoryControllerTests()
     {
+        _mockLocalizer = new Mock<IStringLocalizer<DirectoryController>>();
+        _mockSharedLocalizer = new Mock<IStringLocalizer<SharedResource>>();
         _mockLogger = new Mock<ILogger<DirectoryController>>();
         _mockDirectoryService = new Mock<IDirectoryService>();
 
@@ -25,7 +29,7 @@ public class DirectoryControllerTests
             new Member { Name = "John Doe", WebsiteUrl = "https://www.lipsum.com/" }
         });
 
-        _controller = new DirectoryController(_mockLogger.Object, _mockDirectoryService.Object);
+        _controller = new DirectoryController(_mockLocalizer.Object, _mockSharedLocalizer.Object, _mockLogger.Object, _mockDirectoryService.Object);
     }
 
     [Fact]

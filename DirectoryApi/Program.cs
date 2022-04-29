@@ -1,3 +1,4 @@
+using DirectoryApi;
 using DirectoryApi.Repositories;
 using DirectoryApi.Services;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+                .AddDataAnnotationsLocalization(c => c.DataAnnotationLocalizerProvider = (t, f) => f.Create(typeof(SharedResource)));
+
+builder.Services.AddLocalization(c => c.ResourcesPath = "Resources");
 
 builder.Services.AddCors(c => c.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
