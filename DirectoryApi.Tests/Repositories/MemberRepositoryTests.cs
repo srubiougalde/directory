@@ -45,7 +45,10 @@ public class MemberRepositoryTests
         {
             Id = new Guid("ebaed374-fb88-4768-a37f-3f46d4de304e"),
             Name = "John Doe",
-            WebsiteUrl = "https://www.lipsum.com/"
+            Website = new Website
+            {
+                Url = "https://www.lipsum.com/"
+            }
         });
 
         var members = await repository.GetAllMembersAsync();
@@ -62,7 +65,10 @@ public class MemberRepositoryTests
         var memberInput = new Member
         {
             Name = "John Doe",
-            WebsiteUrl = "https://www.lipsum.com/"
+            Website = new Website
+            {
+                Url = "https://www.lipsum.com/"
+            }
         };
 
         var member = await repository.UpdateMemberAsync(dbMember, memberInput);
@@ -95,21 +101,30 @@ public class MemberRepositoryTests
         {
             Id = new Guid("8b0eecca-69c2-45bc-88f4-576a0b8a40bd"),
             Name = "Phillip Anthropy",
-            WebsiteUrl = "https://www.lipsum.com/"
+            Website = new Website
+            {
+                Url = "https://www.lipsum.com/"
+            }
         });
 
         await context.Members.AddAsync(new Member
         {
             Id = new Guid("3564d532-e066-4513-8db7-5696326a3dea"),
             Name = "Parsley Montana",
-            WebsiteUrl = "https://www.lipsum.com/"
+            Website = new Website
+            {
+                Url = "https://www.lipsum.com/"
+            }
         });
 
         await context.Members.AddAsync(new Member
         {
             Id = new Guid("aa5a3b7e-237f-4a9f-bdc6-45bf58af5200"),
             Name = "Jason Response",
-            WebsiteUrl = "https://www.lipsum.com/"
+            Website = new Website
+            {
+                Url = "https://www.lipsum.com/"
+            }
         });
 
         await context.SaveChangesAsync();

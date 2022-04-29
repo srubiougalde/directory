@@ -16,6 +16,7 @@ public class DirectoryControllerTests
     private readonly Mock<IStringLocalizer<SharedResource>> _mockSharedLocalizer;
     private readonly Mock<ILogger<DirectoryController>> _mockLogger;
     private readonly Mock<IDirectoryService> _mockDirectoryService;
+    private readonly Mock<IWebsiteService> _mockWebsiteService;
     private readonly DirectoryController _controller;
 
     public DirectoryControllerTests()
@@ -24,12 +25,13 @@ public class DirectoryControllerTests
         _mockSharedLocalizer = new Mock<IStringLocalizer<SharedResource>>();
         _mockLogger = new Mock<ILogger<DirectoryController>>();
         _mockDirectoryService = new Mock<IDirectoryService>();
+        _mockWebsiteService = new Mock<IWebsiteService>();
 
         _mockDirectoryService.Setup(p => p.GetAllMembersAsync()).ReturnsAsync(new List<Member>{
-            new Member { Name = "John Doe", WebsiteUrl = "https://www.lipsum.com/" }
+            new Member { Name = "John Doe", Website = new Website { Url = "https://www.lipsum.com/" }}
         });
 
-        _controller = new DirectoryController(_mockLocalizer.Object, _mockSharedLocalizer.Object, _mockLogger.Object, _mockDirectoryService.Object);
+        _controller = new DirectoryController(_mockLocalizer.Object, _mockSharedLocalizer.Object, _mockLogger.Object, _mockDirectoryService.Object, _mockWebsiteService.Object);
     }
 
     [Fact]

@@ -22,7 +22,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseInMemoryDatabase("
 
 // Configure dependencies
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
 builder.Services.AddScoped<IDirectoryService, DirectoryService>();
+builder.Services.AddScoped<IWebsiteService, WebsiteService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

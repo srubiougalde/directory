@@ -19,7 +19,14 @@ public class DirectoryServiceTests
         _mockMemberRepository = new Mock<IMemberRepository>();
 
         _mockMemberRepository.Setup(p => p.GetAllMembersAsync()).ReturnsAsync(new List<Member>{
-            new Member { Name = "John Doe", WebsiteUrl = "https://www.lipsum.com/" }
+            new Member
+            {
+                Name = "John Doe",
+                Website = new Website
+                {
+                    Url = "https://www.lipsum.com/"
+                }
+            }
         });
 
         _service = new DirectoryService(_mockMemberRepository.Object);

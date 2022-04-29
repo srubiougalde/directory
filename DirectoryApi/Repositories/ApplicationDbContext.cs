@@ -21,6 +21,14 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Member>(e =>
         {
             e.HasKey(p => p.Id);
+            e.HasOne(p => p.Website).WithOne();
         });
+
+        modelBuilder.Entity<Website>(e =>
+            e.OwnsMany(p => p.Headings, x =>
+            {
+                x.WithOwner().HasForeignKey();
+            })
+        );
     }
 }

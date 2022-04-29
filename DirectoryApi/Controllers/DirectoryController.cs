@@ -14,13 +14,15 @@ public class DirectoryController : ControllerBase
     private readonly IStringLocalizer<SharedResource> _sharedLocalizer;
     private readonly ILogger<DirectoryController> _logger;
     private readonly IDirectoryService _directoryService;
+    private readonly IWebsiteService _websiteService;
 
-    public DirectoryController(IStringLocalizer<DirectoryController> localizer, IStringLocalizer<SharedResource> sharedLocalizer, ILogger<DirectoryController> logger, IDirectoryService directoryService)
+    public DirectoryController(IStringLocalizer<DirectoryController> localizer, IStringLocalizer<SharedResource> sharedLocalizer, ILogger<DirectoryController> logger, IDirectoryService directoryService, IWebsiteService websiteService)
     {
         _localizer = localizer;
         _sharedLocalizer = sharedLocalizer;
         _logger = logger;
         _directoryService = directoryService;
+        _websiteService = websiteService;
     }
 
     [HttpGet("members")]
@@ -33,7 +35,7 @@ public class DirectoryController : ControllerBase
         {
             Id = x.Id,
             Name = x.Name,
-            WebsiteUrl = x.WebsiteUrl
+            WebsiteUrl = x.Website.Url
         });
 
         return Ok(respose);
@@ -54,7 +56,7 @@ public class DirectoryController : ControllerBase
         {
             Id = member.Id,
             Name = member.Name,
-            WebsiteUrl = member.WebsiteUrl
+            WebsiteUrl = member.Website.Url
         };
 
         return Ok(respose);
@@ -67,7 +69,10 @@ public class DirectoryController : ControllerBase
         var member = await _directoryService.CreateMemberAsync(new Member
         {
             Name = input.Name,
-            WebsiteUrl = input.WebsiteUrl
+            Website = new Website
+            {
+                Url = input.WebsiteUrl
+            }
         });
 
         if (member == null)
@@ -75,11 +80,13 @@ public class DirectoryController : ControllerBase
             return BadRequest();
         }
 
+        var website = await _websiteService.SyncWebsiteHeadingAsync(member.Website);
+
         var respose = new GetMemberResponse
         {
             Id = member.Id,
             Name = member.Name,
-            WebsiteUrl = member.WebsiteUrl
+            WebsiteUrl = member.Website.Url
         };
 
         return Ok(respose);
@@ -92,12 +99,22 @@ public class DirectoryController : ControllerBase
         var memberInput = new Member
         {
             Name = input.Name,
-            WebsiteUrl = input.WebsiteUrl
+            Website = new Website
+            {
+                Url = input.WebsiteUrl
+            }
         };
 
         var member = await _directoryService.UpdateMemberAsync(id, memberInput);
 
-        return (member != null) ? NoContent() : NotFound();
+        if (member == null)
+        {
+            return NotFound();
+        }
+
+        var website = await _websiteService.SyncWebsiteHeadingAsync(member.Website);
+
+        return NoContent();
     }
 
     [HttpDelete("members/{id}")]
@@ -115,7 +132,7 @@ public class DirectoryController : ControllerBase
         {
             Id = member.Id,
             Name = member.Name,
-            WebsiteUrl = member.WebsiteUrl
+            WebsiteUrl = member.Website.Url
         };
 
         return Ok(respose);

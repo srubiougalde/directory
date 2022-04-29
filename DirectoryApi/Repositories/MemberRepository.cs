@@ -11,12 +11,12 @@ public class MemberRepository : BaseRepository<Member>, IMemberRepository
 
     public async Task<IEnumerable<Member>> GetAllMembersAsync()
     {
-        return await FindAll().ToListAsync();
+        return await FindAll().Include(p => p.Website).ToListAsync();
     }
 
     public async Task<Member> GetMemberByIdAsync(Guid id)
     {
-        return await FindByCondition(x => x.Id == id).SingleOrDefaultAsync();
+        return await FindByCondition(x => x.Id == id).Include(p => p.Website).SingleOrDefaultAsync();
     }
 
     public async Task<Member> CreateMemberAsync(Member member)
@@ -32,7 +32,6 @@ public class MemberRepository : BaseRepository<Member>, IMemberRepository
     public async Task<Member> UpdateMemberAsync(Member dbMember, Member inputMember)
     {
         dbMember.Name = inputMember.Name;
-        dbMember.WebsiteUrl = inputMember.WebsiteUrl;
 
         DetachLocal(dbMember, p => p.Id.Equals(dbMember.Id));
         Update(dbMember);
