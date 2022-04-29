@@ -1,6 +1,7 @@
 using DirectoryApi;
 using DirectoryApi.Repositories;
 using DirectoryApi.Services;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -32,12 +33,25 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
+
     app.UseSwagger();
     app.UseSwaggerUI(x =>
                 {
                     x.SwaggerEndpoint("/swagger/v1/swagger.json", "DirectoryApi v1");
                     x.RoutePrefix = string.Empty;
                 });
+}
+else
+{
+    app.UseExceptionHandler(c => c.Run(async context =>
+    {
+        var exception = context.Features
+            .Get<IExceptionHandlerPathFeature>()
+            .Error;
+        var response = new { error = exception.Message };
+        await context.Response.WriteAsJsonAsync(response);
+    }));
 }
 
 app.UseHttpsRedirection();
@@ -52,5 +66,13 @@ app.MapGet("/api/ping", () =>
 {
     return "pong";
 });
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/api/throw", () =>
+    {
+        throw new Exception("Sample exception.");
+    });
+}
 
 app.Run();
