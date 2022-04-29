@@ -48,4 +48,39 @@ public class MemberRepository : BaseRepository<Member>, IMemberRepository
 
         return member;
     }
+
+    // Friendship
+    public async Task<Member> GetMemberFriendsByIdAsync(Guid id)
+    {
+        return await FindByCondition(x => x.Id == id)
+                    .Include(p => p.Website)
+                    .Include(p => p.Friends).ThenInclude(p => p.Website)
+                    .SingleOrDefaultAsync();
+    }
+
+    public async Task<Member> CreateFriendshipAsync(Guid id, Guid friendId)
+    {
+        var member = await FindByCondition(x => x.Id == id).SingleOrDefaultAsync();
+        var friend = await FindByCondition(x => x.Id == friendId).SingleOrDefaultAsync();
+
+        member.Friends.Add(friend);
+        friend.Friends.Add(member);
+
+        await SaveAsync();
+
+        return member;
+    }
+
+    public async Task<Member> DeleteFriendshipMemberAsync(Guid id, Guid friendId)
+    {
+        var member = await FindByCondition(x => x.Id == id).SingleOrDefaultAsync();
+        var friend = await FindByCondition(x => x.Id == friendId).SingleOrDefaultAsync();
+
+        member.Friends.Remove(friend);
+        friend.Friends.Remove(member);
+
+        await SaveAsync();
+
+        return member;
+    }
 }

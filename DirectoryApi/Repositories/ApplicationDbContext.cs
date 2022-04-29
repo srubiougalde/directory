@@ -11,6 +11,7 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<Member> Members => Set<Member>();
+    public DbSet<Friendship> Friendships => Set<Friendship>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,6 +23,11 @@ public class ApplicationDbContext : DbContext
         {
             e.HasKey(p => p.Id);
             e.HasOne(p => p.Website).WithOne();
+            e.HasMany(p => p.Friends)
+            .WithMany(p => p.FriendOf)
+            .UsingEntity<Friendship>(
+                p => p.HasOne<Member>().WithMany().HasForeignKey(x => x.MemberId),
+                p => p.HasOne<Member>().WithMany().HasForeignKey(x => x.FriendId));
         });
 
         modelBuilder.Entity<Website>(e =>

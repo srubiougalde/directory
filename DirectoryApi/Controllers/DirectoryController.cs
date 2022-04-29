@@ -37,6 +37,7 @@ public class DirectoryController : ControllerBase
             Name = x.Name,
             WebsiteUrl = x.Website.Url,
             WebsiteShortUrl = $"https://evr.ly/{x.Website.ShortUrl}",
+            FriendsCount = x.Friends.Count
         });
 
         return Ok(respose);
@@ -58,7 +59,8 @@ public class DirectoryController : ControllerBase
             Id = member.Id,
             Name = member.Name,
             WebsiteUrl = member.Website.Url,
-            WebsiteShortUrl = $"https://evr.ly/{member.Website.ShortUrl}"
+            WebsiteShortUrl = $"https://evr.ly/{member.Website.ShortUrl}",
+            FriendsCount = member.Friends.Count
         };
 
         return Ok(respose);
@@ -139,5 +141,62 @@ public class DirectoryController : ControllerBase
         };
 
         return Ok(respose);
+    }
+
+    [HttpGet("members/{id}/friends")]
+    public async Task<IActionResult> GetMemberFriends(Guid id)
+    {
+        _logger.LogInformation($"{_localizer["Getting friends of id"]} {id}");
+
+        var member = await _directoryService.GetMemberFriendsByIdAsync(id);
+
+        var result = new GetFriendshipResponse
+        {
+            Id = member.Id,
+            Name = member.Name,
+            WebsiteUrl = member.Website.Url,
+            WebsiteShortUrl = $"https://evr.ly/{member.Website.ShortUrl}",
+            Friends = member.Friends.Select(x => new GetFriendshipResponse
+            {
+                Id = x.Id,
+                Name = x.Name,
+                WebsiteUrl = x.Website.Url,
+                WebsiteShortUrl = $"https://evr.ly/{x.Website.ShortUrl}",
+                Headings = x.Website.Headings.Select(h => (Name: h.Name, Text: h.InnerText)).ToList()
+            }).ToList()
+        };
+
+        return Ok(result);
+    }
+
+    [HttpPost("members/{id}/friends")]
+    public async Task<IActionResult> CreateFriendship(Guid id, CreateFriendshipRequest input)
+    {
+        _logger.LogInformation($"{_localizer["Creating friends of id"]} {id}");
+
+        var member = await _directoryService.CreateFriendshipAsync(id, input.FriendId);
+
+        var result = new GetFriendshipResponse
+        {
+            Id = member.Id,
+            Name = member.Name,
+            Friends = member.Friends.Where(x => x.Id.Equals(input.FriendId)).Select(x => new GetFriendshipResponse
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList()
+        };
+
+        return Ok(result);
+    }
+
+    [HttpDelete("members/{id}/friends/{friendId}")]
+    public async Task<IActionResult> DeleteFriendship(Guid id, Guid friendId)
+    {
+        _logger.LogInformation($"{_localizer["Deliting friends of id"]} {id}");
+
+        await _directoryService.DeleteFriendshipMemberAsync(id, friendId);
+
+        return Ok();
     }
 }

@@ -55,4 +55,20 @@ public class DirectoryService : IDirectoryService
 
         return await _memberRepository.DeleteMemberAsync(member);
     }
+
+    // Friendship
+    public async Task<Member> GetMemberFriendsByIdAsync(Guid id)
+    {
+        return await _memberRepository.GetMemberFriendsByIdAsync(id);
+    }
+
+    public async Task<Member> CreateFriendshipAsync(Guid id, Guid friendId)
+    {
+        return await _memberRepository.CreateFriendshipAsync(id, friendId);
+    }
+
+    public async Task<Member> DeleteFriendshipMemberAsync(Guid id, Guid friendId)
+    {
+        return await _memberRepository.DeleteFriendshipMemberAsync(id, friendId);
+    }
 }

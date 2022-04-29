@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using DirectoryApi;
 using DirectoryApi.Repositories;
 using DirectoryApi.Services;
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers()
+                .AddJsonOptions(c => c.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
                 .AddDataAnnotationsLocalization(c => c.DataAnnotationLocalizerProvider = (t, f) => f.Create(typeof(SharedResource)));
 
 builder.Services.AddLocalization(c => c.ResourcesPath = "Resources");

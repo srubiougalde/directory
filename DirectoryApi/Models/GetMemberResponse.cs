@@ -7,4 +7,5 @@ public class GetMemberResponse
     public string? Name { get; set; }
     public string? WebsiteUrl { get; set; }
     public string? WebsiteShortUrl { get; set; }
+    public int FriendsCount { get; set; }
 }
