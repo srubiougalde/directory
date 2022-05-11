@@ -25,4 +25,10 @@ public class WebsiteRepository : BaseRepository<Website>, IWebsiteRepository
 
         return dbWebsite;
     }
+
+    public async Task<List<Website>> GetWebsiteByTopicAsync(string query)
+    {
+        return await FindByCondition(x => x.Headings.Any(h => h.InnerText.Equals(query, StringComparison.OrdinalIgnoreCase)))
+                            .ToListAsync();
+    }
 }

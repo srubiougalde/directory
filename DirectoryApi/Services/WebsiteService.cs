@@ -40,4 +40,10 @@ public class WebsiteService : IWebsiteService
 
         return await _websiteRepository.UpdateWebsiteAsync(website, website);
     }
+
+    // Search
+    public async Task<List<Website>> GetWebsiteByTopicAsync(string query)
+    {
+        return await _websiteRepository.GetWebsiteByTopicAsync(query);
+    }
 }
