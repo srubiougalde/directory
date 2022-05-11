@@ -1,10 +1,15 @@
+using System.Text;
 using System.Text.Json.Serialization;
 using DirectoryApi;
+using DirectoryApi.Auth;
 using DirectoryApi.Repositories;
 using DirectoryApi.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using DirectoryApi.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,9 +33,84 @@ builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
 builder.Services.AddScoped<IDirectoryService, DirectoryService>();
 builder.Services.AddScoped<IWebsiteService, WebsiteService>();
 
+builder.Services.AddSingleton<IJwtFactory, JwtFactory>();
+builder.Services.AddSingleton<IAuthorizationCodeFactory, AuthorizationCodeFactory>();
+builder.Services.AddScoped<IRolesRepository, RolesRepository>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IAccountsService, AccountsService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+
+// jwt wire up
+var secret = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("this is my custom Secret key for authentication"));
+
+// Configure JwtIssuerOptions
+builder.Services.Configure<JwtIssuerOptions>(options =>
+{
+    options.Issuer = "https://localhost:5001";
+    options.Audience = "https://localhost:5001";
+    options.SigningCredentials = new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+});
+
+var tokenValidationParameters = new TokenValidationParameters
+{
+    ValidateIssuer = true,
+    ValidIssuer = "https://localhost:5001",
+
+    ValidateAudience = true,
+    ValidAudience = "https://localhost:5001",
+
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = secret,
+
+    RequireExpirationTime = false,
+    ValidateLifetime = true,
+    ClockSkew = TimeSpan.Zero
+};
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(configureOptions =>
+{
+    configureOptions.ClaimsIssuer = "https://localhost:5001";
+    configureOptions.RequireHttpsMetadata = false;
+    configureOptions.SaveToken = true;
+    configureOptions.TokenValidationParameters = tokenValidationParameters;
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "DirectoryApi", Version = "v1" }));
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "DirectoryApi", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Id = "Bearer",
+                                Type = ReferenceType.SecurityScheme
+                            },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header
+                        },
+                        new List<string>()
+                    }
+                });
+});
 
 var app = builder.Build();
 
@@ -61,6 +141,8 @@ else
 app.UseHttpsRedirection();
 
 app.UseCors("CorsPolicy");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
