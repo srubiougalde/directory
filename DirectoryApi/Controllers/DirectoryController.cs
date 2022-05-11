@@ -203,4 +203,42 @@ public class DirectoryController : ControllerBase
 
         return Ok();
     }
+
+    [HttpGet("topics/search/{query}")]
+    public async Task<IActionResult> SearchTopicExperts(string query)
+    {
+        // Get the user in session based on the token
+        var userIdentity = await HttpContext.GetUserIdentity(_userService);
+        if (userIdentity == null)
+        {
+            return BadRequest("Invalid claims identity");
+        }
+
+        _logger.LogInformation(_localizer["Searching experts for topic"]);
+
+        // Get websites with certain topic 
+        var websites = await _websiteService.GetWebsiteByTopicAsync(query);
+
+        // Get friends for the current user
+        var friends = (await _directoryService.GetMemberFriendsByIdAsync(userIdentity.Id)).Friends;
+
+        // Filter friend's websites 
+        var suggestion = websites.Where(x => !friends.Any(f => f.Id == x.MemberId));
+
+        var experts = new List<GetMemberResponse>();
+        foreach (Website s in suggestion)
+        {
+            var expert = await _directoryService.GetMemberByIdAsync(s.MemberId);
+
+            experts.Add(new GetMemberResponse
+            {
+                Id = expert.Id,
+                Name = expert.Name,
+                WebsiteUrl = expert.Website.Url,
+                WebsiteShortUrl = $"https://evr.ly/{expert.Website.ShortUrl}",
+                FriendsCount = expert.Friends.Count
+            });
+        }
+        return Ok(experts);
+    }
 }
