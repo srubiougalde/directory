@@ -17,6 +17,7 @@ public class DirectoryControllerTests
     private readonly Mock<ILogger<DirectoryController>> _mockLogger;
     private readonly Mock<IDirectoryService> _mockDirectoryService;
     private readonly Mock<IWebsiteService> _mockWebsiteService;
+    private readonly Mock<IUsersService> _mockUserService;
     private readonly DirectoryController _controller;
 
     public DirectoryControllerTests()
@@ -26,12 +27,13 @@ public class DirectoryControllerTests
         _mockLogger = new Mock<ILogger<DirectoryController>>();
         _mockDirectoryService = new Mock<IDirectoryService>();
         _mockWebsiteService = new Mock<IWebsiteService>();
+        _mockUserService = new Mock<IUsersService>();
 
         _mockDirectoryService.Setup(p => p.GetAllMembersAsync()).ReturnsAsync(new List<Member>{
             new Member { Name = "John Doe", Website = new Website { Url = "https://www.lipsum.com/" }}
         });
 
-        _controller = new DirectoryController(_mockLocalizer.Object, _mockSharedLocalizer.Object, _mockLogger.Object, _mockDirectoryService.Object, _mockWebsiteService.Object);
+        _controller = new DirectoryController(_mockLocalizer.Object, _mockSharedLocalizer.Object, _mockLogger.Object, _mockDirectoryService.Object, _mockWebsiteService.Object, _mockUserService.Object);
     }
 
     [Fact]

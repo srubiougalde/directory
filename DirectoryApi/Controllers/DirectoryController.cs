@@ -1,12 +1,14 @@
 using DirectoryApi.Entities;
 using DirectoryApi.Models;
 using DirectoryApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
 namespace DirectoryApi.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class DirectoryController : ControllerBase
 {
@@ -15,14 +17,16 @@ public class DirectoryController : ControllerBase
     private readonly ILogger<DirectoryController> _logger;
     private readonly IDirectoryService _directoryService;
     private readonly IWebsiteService _websiteService;
+    private readonly IUsersService _userService;
 
-    public DirectoryController(IStringLocalizer<DirectoryController> localizer, IStringLocalizer<SharedResource> sharedLocalizer, ILogger<DirectoryController> logger, IDirectoryService directoryService, IWebsiteService websiteService)
+    public DirectoryController(IStringLocalizer<DirectoryController> localizer, IStringLocalizer<SharedResource> sharedLocalizer, ILogger<DirectoryController> logger, IDirectoryService directoryService, IWebsiteService websiteService, IUsersService userService)
     {
         _localizer = localizer;
         _sharedLocalizer = sharedLocalizer;
         _logger = logger;
         _directoryService = directoryService;
         _websiteService = websiteService;
+        _userService = userService;
     }
 
     [HttpGet("members")]
