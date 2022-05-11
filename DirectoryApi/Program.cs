@@ -161,4 +161,28 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Add user for testing
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    context.Users.AddRange(new User[] { new User
+            {
+                Id = new Guid("641d7639-ea52-4628-83d2-8a5189f8d3ea"),
+                Profile = new UserProfile
+                {
+                    Id = Guid.NewGuid(),
+                    Email = "superadmin@test.com",
+                    FirstName = "Super",
+                    LastName = "Admin",
+                    Password = "1000.H25BBisUZoxaRUzEKuf2Ig==.n1YixZvSciittr14+e6/wjl7hfIGKHI7SZrnlxO3+v4="
+                },
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+                Role = new Role { Id = Guid.NewGuid(), Name = "super_admin", Description = "Super Administrador" }
+            } });
+
+    context.SaveChanges();
+}
+
 app.Run();

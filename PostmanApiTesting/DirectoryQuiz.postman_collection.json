@@ -131,6 +131,43 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "api/account/auth",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"superadmin@test.com\",\r\n    \"password\": \"superadmin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:5001/api/account/auth",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"api",
+								"account",
+								"auth"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
